@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>คู่มือทำช่องคลิปสั้นด้วย Claude</title>
+<meta name="description" content="คู่มือเริ่มทำช่อง YouTube Shorts / Facebook Reels โดยคุยกับ Claude Code ใน VS Code จนได้คลิปพร้อมอัป พร้อม Starter Kit">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f6f2; --surface:#ffffff; --surface2:#efede6; --ink:#1d1d1b; --muted:#5f5d57; --line:#dedbd2;
+  --accent:#c2410c; --accent-soft:#fdeee4; --ok:#15803d; --ok-soft:#e5f4ea; --warn:#a16207; --warn-soft:#fbf1d9;
+  --bad:#b91c1c; --bad-soft:#fbe7e7; --code:#2a2a27; --codeink:#f1efe8;
+  --yt:#c2410c; --fb:#2563eb;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#151513; --surface:#1e1e1b; --surface2:#262622; --ink:#ecebe6; --muted:#a3a19a; --line:#34332e;
+    --accent:#fb923c; --accent-soft:#3a2416; --ok:#4ade80; --ok-soft:#16301f; --warn:#facc15; --warn-soft:#332a10;
+    --bad:#f87171; --bad-soft:#3a1717; --code:#0e0e0d; --codeink:#ecebe6; --yt:#fb923c; --fb:#60a5fa;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#151513; --surface:#1e1e1b; --surface2:#262622; --ink:#ecebe6; --muted:#a3a19a; --line:#34332e;
+  --accent:#fb923c; --accent-soft:#3a2416; --ok:#4ade80; --ok-soft:#16301f; --warn:#facc15; --warn-soft:#332a10;
+  --bad:#f87171; --bad-soft:#3a1717; --code:#0e0e0d; --codeink:#ecebe6; --yt:#fb923c; --fb:#60a5fa;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.75 "IBM Plex Sans Thai",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--accent)}
+code,pre{font-family:"IBM Plex Mono",ui-monospace,monospace}
+code{background:var(--surface2);padding:.1em .4em;border-radius:5px;font-size:.88em}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px;display:grid;grid-template-columns:230px minmax(0,1fr);gap:48px}
+nav.toc{position:sticky;top:0;align-self:start;max-height:100vh;overflow:auto;padding:32px 0;font-size:14.5px}
+nav.toc b{display:block;font-size:12px;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
+nav.toc a{display:block;color:var(--muted);text-decoration:none;padding:5px 10px;border-left:2px solid var(--line)}
+nav.toc a:hover{color:var(--ink);border-color:var(--accent)}
+main{padding:32px 0 80px;min-width:0}
+header.hero{padding:40px 0 24px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--accent)}
+h1{font-size:clamp(30px,5vw,46px);line-height:1.25;margin:8px 0 14px;font-weight:700}
+.lead{font-size:19px;color:var(--muted);max-width:720px;margin:0}
+h2{font-size:28px;line-height:1.35;margin:64px 0 6px;scroll-margin-top:16px}
+h2 .n{color:var(--accent);margin-right:10px}
+h3{font-size:20px;margin:32px 0 6px}
+.sub{color:var(--muted);margin:0 0 20px}
+p{margin:0 0 14px}
+ul,ol{padding-left:22px;margin:0 0 14px}
+li{margin:4px 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:16px 0}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.stat .v{font-size:30px;font-weight:700;line-height:1.2}
+.stat .l{font-size:14px;color:var(--muted)}
+.note{border-radius:12px;padding:14px 18px;margin:16px 0;border:1px solid transparent}
+.note.ok{background:var(--ok-soft)} .note.warn{background:var(--warn-soft)} .note.bad{background:var(--bad-soft)} .note.acc{background:var(--accent-soft)}
+.note b:first-child{display:block;margin-bottom:2px}
+table{width:100%;border-collapse:collapse;font-size:15.5px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--muted);font-weight:600;background:var(--surface2)}
+.tbl{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;margin:16px 0}
+.tbl table td:first-child{white-space:nowrap}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.t1{background:var(--ok-soft);color:var(--ok)} .t2{background:var(--warn-soft);color:var(--warn)} .t3{background:var(--bad-soft);color:var(--bad)}
+.pre{position:relative;margin:12px 0 18px}
+.pre pre{background:var(--code);color:var(--codeink);border-radius:12px;padding:16px 18px;margin:0;overflow-x:auto;font-size:14px;line-height:1.65;white-space:pre-wrap;word-break:break-word}
+.pre .lbl{font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:600}
+.copy{position:absolute;top:30px;right:8px;font:500 12px "IBM Plex Sans Thai";background:#ffffff1a;color:var(--codeink);border:1px solid #ffffff33;border-radius:7px;padding:3px 10px;cursor:pointer}
+.copy:hover{background:#ffffff33}
+.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;counter-reset:f;margin:18px 0}
+.flow div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;position:relative}
+.flow div::before{counter-increment:f;content:counter(f);display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:700;margin-right:8px}
+.flow div small{display:block;color:var(--muted);font-size:13px;margin-top:4px}
+.who{font-size:12px;font-weight:600;padding:1px 7px;border-radius:6px;margin-left:4px}
+.who.c{background:var(--accent-soft);color:var(--accent)} .who.h{background:var(--surface2);color:var(--muted)}
+.bars{display:grid;gap:12px}
+.bar .t{font-size:14.5px;margin-bottom:4px}
+.bar .row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.bar .row i{display:block;height:10px;border-radius:5px;min-width:2px}
+.bar .yt i{background:var(--yt)} .bar .fb i{background:var(--fb)}
+.legend{display:flex;gap:18px;font-size:13px;color:var(--muted);margin:6px 0 14px}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.legend .y::before{background:var(--yt)} .legend .f::before{background:var(--fb)}
+.lesson{display:grid;grid-template-columns:44px 1fr;gap:4px 12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.lesson .k{font-size:22px;font-weight:700;color:var(--accent);line-height:1.4}
+.lesson h4{margin:0;font-size:17.5px}
+.lesson p{margin:2px 0 0;color:var(--muted);font-size:15.5px}
+.dl{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.btn{display:inline-block;background:var(--accent);color:#fff;text-decoration:none;font-weight:600;padding:12px 22px;border-radius:10px}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 18px;margin:10px 0}
+details summary{cursor:pointer;font-weight:600}
+details[open] summary{margin-bottom:8px}
+footer{margin-top:72px;padding-top:20px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
+.theme{position:fixed;right:16px;bottom:16px;background:var(--surface);border:1px solid var(--line);color:var(--ink);border-radius:99px;padding:8px 14px;font:500 13px "IBM Plex Sans Thai";cursor:pointer;z-index:5}
+@media (max-width:900px){
+  .wrap{grid-template-columns:minmax(0,1fr);gap:0}
+  nav.toc{position:static;max-height:none;padding:16px 0 0;columns:2;font-size:14px}
+  nav.toc b{column-span:all}
+  .g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .flow{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:560px){
+  body{font-size:16px}
+  .g2,.g3{grid-template-columns:1fr}
+  nav.toc{columns:1}
+  .stat .v{font-size:25px}
+}
+.timeline{position:relative;margin:18px 0 8px;padding-left:26px}
+.timeline::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.tl{position:relative;margin:0 0 18px}
+.tl::before{content:"";position:absolute;left:-25px;top:8px;width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--bg)}
+.tl .d{font-size:13px;font-weight:600;color:var(--accent)}
+.tl h4{margin:0;font-size:17.5px}
+.tl p{margin:2px 0 0;color:var(--muted);font-size:15.5px}
+.genre{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.genre h4{margin:0 0 6px;font-size:18px}
+.genre dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:14.5px}
+.genre dt{color:var(--muted);font-weight:600;white-space:nowrap}
+.genre dd{margin:0}
+.fill{background:var(--warn-soft);color:var(--warn);border:1px dashed var(--warn);border-radius:6px;padding:0 6px;font-weight:600}
+.byline{font-size:13px;color:var(--muted);margin-bottom:14px}
+.qa h4{margin:0 0 4px;font-size:17px}
+.qa p{margin:0;color:var(--muted);font-size:15.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc" aria-label="สารบัญ">
+  <b>สารบัญ</b>
+  <a href="#story">1. ฉันเริ่มยังไง</a>
+  <a href="#before">2. ก่อนเริ่ม: เงิน · คอม · เวลา</a>
+  <a href="#overview">3. ภาพรวมการทำงาน</a>
+  <a href="#genre">4. เลือกแนวช่อง</a>
+  <a href="#tools">5. เครื่องมือ + การเชื่อมต่อ</a>
+  <a href="#install">6. ติดตั้ง</a>
+  <a href="#style">7. หน้าตาช่อง</a>
+  <a href="#rights">8. ลิขสิทธิ์ + กฎแพลตฟอร์ม</a>
+  <a href="#produce">9. ทำคลิปทีละขั้น</a>
+  <a href="#lessons">10. หลักที่ใช้ได้ทุกแนว</a>
+  <a href="#upload">11. อัปโหลด + สร้างรายได้</a>
+  <a href="#measure">12. วัดผลแล้วปรับ</a>
+  <a href="#trouble">13. ปัญหาที่เจอบ่อย</a>
+  <a href="#kit">⬇ Starter Kit</a>
+</nav>
+
+<main>
+<header class="hero">
+  <div class="byline">จัดทำโดย บิ๊ก · ช่องดูมาให้แล้ว</div>
+  <div class="eyebrow">คู่มือ + STARTER KIT</div>
+  <h1>ทำช่องคลิปสั้นแนวตั้ง<br>โดยคุยกับ Claude จนได้คลิปพร้อมอัป</h1>
+  <p class="lead">คุณคุยกับ Claude ใน VS Code ให้ช่วยคิดเรื่อง เขียนบท ทำเสียง หาภาพ และประกอบคลิป แล้วได้ไฟล์ .mp4 ไปอัปขึ้น YouTube Shorts และ Facebook Reels ได้เลย ใช้ได้กับทุกแนวช่อง ไม่ว่าจะเล่านิยาย ความรู้ นิทาน หรือเล่าสรุปคลิป</p>
+</header>
+
+<!-- 1 STORY -->
+<h2 id="story"><span class="n">1</span>ฉันเริ่มยังไง</h2>
+<p class="sub">ช่อง "ดูมาให้แล้ว" เล่าสรุปคลิปต่างประเทศเป็นภาษาไทย ทำด้วยวิธีในคู่มือนี้ทั้งหมด</p>
+<div class="grid g4">
+  <div class="stat"><div class="v">2 สัปดาห์</div><div class="l">ตั้งแต่เปิดช่อง (1–14 พ.ย. 2569)</div></div>
+  <div class="stat"><div class="v">48</div><div class="l">คลิปที่อัปแล้ว จากที่ทำ 112 ตัว</div></div>
+  <div class="stat"><div class="v">1.59 ล้าน</div><div class="l">วิวรวม YouTube Shorts</div></div>
+  <div class="stat"><div class="v">7.3 แสน</div><div class="l">วิวรวม Facebook Reels</div></div>
+</div>
+<div class="timeline">
+  <div class="tl"><div class="d">วันที่ 1</div><h4>เปิดช่อง + ทำ 2 คลิปแรก</h4><p>คลิปแรกได้ผลดีเกินคาด ส่วนคลิปที่สองติแล้วแก้หลายรอบ ทั้งฮุค ลำดับเรื่อง และภาพ จนได้ "แม่แบบ" ที่ใช้กับคลิปต่อๆ มา วันแรกยังลองผิดลองถูกเยอะ เช่นเพลงที่ให้ AI แต่งเองฟังไม่ดีเลยเปลี่ยนไปใช้เพลงจริง และทำปกแล้วไม่ชอบเลยเลิกทำ</p></div>
+  <div class="tl"><div class="d">วันที่ 2–3</div><h4>ทำเป็นรอบ รอบละ 5 คลิป</h4><p>ร่างบททั้ง 5 ตัวให้ผ่านก่อน แล้วเจนเสียงรวมครั้งเดียวเพื่อประหยัดโควตา ระหว่างนั้นเจอว่าคลิป 40–48 วิคนดูจบมากกว่าคลิป 55 วิ และคนดูไม่ชอบเอฟเฟกต์เด้งหรือสั่น จึงจดเป็นกฎ</p></div>
+  <div class="tl"><div class="d">วันที่ 4</div><h4>ดูยอดครั้งแรก แล้วเจอแนวที่ใช่</h4><p>คลิปแรกได้ 21K วิว ขณะที่คลิปอื่นได้แค่หลักพัน ดูคอมเมนต์แล้วพบว่าคนชอบเรื่องที่ผูกกับชีวิตตัวเอง จึงปรับการเลือกเรื่องทั้งช่องตามนั้น</p></div>
+  <div class="tl"><div class="d">รอบวันที่ 4</div><h4>คลิปที่ 18 และ 20 ปัง</h4><p>คลิปที่ 20 ได้ 400K บน YouTube แต่ได้แค่ 29K บน FB ส่วนคลิปที่ 18 ได้แค่ 1.7K บน YouTube แต่ได้ 195K บน FB จึงอัปทั้งสองที่ทุกคลิปตั้งแต่นั้น</p></div>
+  <div class="tl"><div class="d">วันที่ 11</div><h4>รวมทุกอย่างเป็น PLAYBOOK ฉบับเดียว</h4><p>เอากฎที่จดไว้กระจัดกระจาย ยอดจริงทุกคลิป และผลวิเคราะห์ช่องดังแนวเดียวกัน 800 กว่าคลิป มารวมไว้ไฟล์เดียว ตั้งแต่นั้น Claude ทำคลิปออกมาตรงใจตั้งแต่รอบแรกบ่อยขึ้นมาก</p></div>
+  <div class="tl"><div class="d">วันที่ 14</div><h4>ตอนนี้</h4><p>ทำไปแล้ว 100 กว่าคลิป แต่ไม่ได้อัปทุกตัว คลิปที่ไม่ผ่านมาตรฐานตัวเองก็ไม่อัป ทำเฉพาะเวลาว่าง วันละประมาณ 2 ชั่วโมง ส่วนใหญ่แค่อ่านสิ่งที่ Claude เสนอแล้วสั่งต่อ</p></div>
+</div>
+<div class="note warn"><b>ค่ากลางต่อคลิปไม่ได้สูงขนาดนั้น</b>YouTube ประมาณ 9.7K และ Facebook ประมาณ 4K วิวต่อคลิป ยอดรวมส่วนใหญ่มาจากไม่กี่คลิปที่ปัง ซึ่งเป็นธรรมชาติของคลิปสั้น ต้องทำต่อเนื่องหลายคลิปถึงจะเจอตัวที่ปัง</div>
+<p><b>ช่องคุณไม่จำเป็นต้องเป็นแนวเดียวกับช่องนี้</b> สิ่งที่ใช้ได้กับทุกแนวคือวิธีทำงาน: ให้ Claude ผลิต คุณเป็นคนตัดสิน และทุกครั้งที่ติ ให้จดเป็นกฎลง PLAYBOOK</p>
+
+<!-- 2 BEFORE -->
+<h2 id="before"><span class="n">2</span>ก่อนเริ่ม: เงิน · คอม · เวลา</h2>
+<div class="grid g3">
+  <div class="card"><b>💰 ค่าใช้จ่ายต่อเดือน</b>
+    <ul style="margin:8px 0 0">
+      <li><b>Claude</b> ต้องเป็นแพ็กเกจเสียเงิน: Pro ประมาณ $20, Max $100 หรือ $200 (ราคา ณ พ.ย. 2569)</li>
+      <li>เครื่องมืออื่นในระดับ 1 <b>ฟรีทั้งหมด</b></li>
+      <li>ภาพ AI ฟรีถ้าเจนในเครื่องเอง ถ้าใช้บริการออนไลน์จะมีค่าใช้จ่าย</li>
+      <li><b>ช่องตัวอย่างใช้แค่แพ็กเกจ Pro</b> รวมค่าใช้จ่ายขั้นต่ำจึงประมาณ $20 ต่อเดือน</li>
+    </ul></div>
+  <div class="card"><b>💻 คอมพิวเตอร์</b>
+    <ul style="margin:8px 0 0">
+      <li>Windows หรือ Mac รุ่นไม่เก่ามาก RAM 8GB ขึ้นไป พื้นที่ว่าง 20GB ขึ้นไป</li>
+      <li><b>ไม่ต้องมีการ์ดจอแรง</b> ก็ทำคลิปได้</li>
+      <li>มีการ์ดจอ NVIDIA จะถอดเสียงเร็วขึ้นมาก และเจนภาพ AI ในเครื่องได้ฟรี</li>
+    </ul></div>
+  <div class="card"><b>⏱️ เวลา</b>
+    <ul style="margin:8px 0 0">
+      <li>ตั้งระบบครั้งแรก: ครึ่งวันถึง 1 วัน</li>
+      <li>หลังจากนั้นทำเป็นรอบ รอบละ 3–5 คลิป</li>
+      <li>เวลาส่วนใหญ่ของคุณหมดไปกับ <b>การเลือกเรื่องและตรวจบท</b> ส่วนงานผลิต Claude ทำให้</li>
+      <li>ช่องตัวอย่าง: <b>รอบละ 4–5 คลิป ใช้ประมาณ 1–2 ชั่วโมง</b> นับจากเตรียมวัตถุดิบจนได้ไฟล์ (วัดจากเวลาของไฟล์จริง) โดยทำแค่ช่วงว่าง วันละประมาณ 2 ชั่วโมง</li>
+    </ul></div>
+</div>
+<h3>เปิดช่อง + เปิดเพจ</h3>
+<ol>
+<li><b>ใช้บัญชีส่วนตัว</b> ไม่ใช้อีเมลที่ทำงาน (บัญชีบริษัทอาจโดนปิดหรือถูกเรียกคืน)</li>
+<li><b>YouTube:</b> เข้า youtube.com → รูปโปรไฟล์ → สร้างช่อง → ตั้งชื่อและ @handle → <b>ยืนยันเบอร์โทร</b> (ปลดล็อกบางฟีเจอร์ เช่นตั้งภาพปกเอง)</li>
+<li><b>Facebook:</b> สร้าง <b>เพจ</b> แยกจากโปรไฟล์ส่วนตัว (หรือเปิดโหมดมืออาชีพ) แล้วใช้ <b>Meta Business Suite</b> อัปและตั้งเวลาลง</li>
+<li>ใช้ชื่อเดียวกันทุกแพลตฟอร์ม ภาพโปรไฟล์และแบนเนอร์ให้ Claude ช่วยทำได้ หลังจากออกแบบหน้าตาช่องแล้ว (ข้อ 7)</li>
+</ol>
+
+<!-- 3 OVERVIEW -->
+<h2 id="overview"><span class="n">3</span>ภาพรวมการทำงาน</h2>
+<p class="sub">คุณเป็น "บรรณาธิการ" ส่วน Claude เป็น "ทีมผลิต" ที่ทำงานในเครื่องคุณ</p>
+<div class="flow">
+  <div>เสนอเรื่อง<span class="who c">Claude</span><small>ตามแนวช่องใน PLAYBOOK</small></div>
+  <div>เลือกเรื่อง<span class="who h">คุณ</span><small>เลือกจากตารางที่ Claude เสนอ</small></div>
+  <div>ร่างบท<span class="who c">Claude</span><small>ฮุค + เล่าเรื่อง + มุมของช่อง</small></div>
+  <div>ตรวจบท<span class="who h">คุณ</span><small>ติ แก้ จนพอใจ</small></div>
+  <div>เสียง + ซับ<span class="who c">Claude</span><small>เสียงพากย์ AI และซับที่ตรงเสียง</small></div>
+  <div>ภาพ + ประกอบ<span class="who c">Claude</span><small>ฟุตเทจ สต็อก หรือภาพ AI แล้วเรนเดอร์ 9:16</small></div>
+  <div>ดูคลิป + อัป<span class="who h">คุณ</span><small>Claude เตรียมชื่อ คำอธิบาย และเครดิตไว้ให้</small></div>
+  <div>ดูยอดแล้วสอนระบบ<span class="who h">คุณ</span><span class="who c">Claude</span><small>กฎใหม่ถูกจดลง PLAYBOOK</small></div>
+</div>
+<div class="note acc"><b>หัวใจของระบบคือไฟล์ <code>PLAYBOOK.md</code></b>ทุกครั้งที่คุณติว่า "ไม่ชอบแบบนี้" ให้ Claude จดเป็นกฎ แล้ว Claude จะอ่านไฟล์นี้ก่อนทำทุกคลิป ยิ่งทำนาน ระบบยิ่งรู้ใจช่องคุณ</div>
+<p>ไม่ต้องเขียนโค้ดเอง แต่ควรใช้คอมคล่อง: ติดตั้งโปรแกรมเป็น, เปิด Terminal ได้, เข้าใจเรื่องไฟล์และโฟลเดอร์ ถ้ามีอะไรพัง ให้วาง error ให้ Claude อ่าน แล้วมันจะแก้ให้</p>
+
+<!-- 4 GENRE -->
+<h2 id="genre"><span class="n">4</span>เลือกแนวช่อง</h2>
+<p class="sub">แนวช่องเป็นตัวกำหนดว่าภาพมาจากไหน บทเขียนแบบไหน และต้องระวังอะไร รายละเอียดเต็มอยู่ใน <code>GENRES.md</code> ใน Kit</p>
+<div class="grid g2">
+  <div class="genre"><h4>📖 เล่าเรื่อง / นิยาย / ลึกลับ</h4><dl>
+    <dt>วัตถุดิบ</dt><dd>แต่งเองทั้งหมด โดย Claude ช่วยคิดพล็อต</dd>
+    <dt>ภาพ</dt><dd>ภาพ AI เป็นฉากๆ + ซูมช้า</dd>
+    <dt>จุดแข็ง</dt><dd>ไม่มีปัญหาลิขสิทธิ์ ทำเป็นซีรีส์ให้คนรอดูตอนต่อได้</dd>
+    <dt>ระวัง</dt><dd>คุมหน้าตัวละครให้เหมือนเดิมทุกภาพ ภาพไม่น่ากลัวหรือรุนแรงเกินไป</dd></dl></div>
+  <div class="genre"><h4>🧸 นิทานเด็ก</h4><dl>
+    <dt>วัตถุดิบ</dt><dd>แต่งเอง หรือนิทานสาธารณสมบัติที่เล่าใหม่</dd>
+    <dt>ภาพ</dt><dd>ตัวละครประจำช่อง สีสดใส</dd>
+    <dt>จุดแข็ง</dt><dd>คนดูซ้ำบ่อย ไม่ค่อยตกยุค</dd>
+    <dt>ระวัง</dt><dd>ต้องตั้งเป็น "สร้างมาเพื่อเด็ก" ซึ่งจะปิดคอมเมนต์และได้โฆษณาน้อยกว่า</dd></dl></div>
+  <div class="genre"><h4>💡 ความรู้ / เรื่องจริงที่คนไม่รู้</h4><dl>
+    <dt>วัตถุดิบ</dt><dd>ข้อเท็จจริงจาก 2 แหล่งขึ้นไป</dd>
+    <dt>ภาพ</dt><dd>ภาพสต็อก สาธารณสมบัติ และกราฟิกตัวเลข</dd>
+    <dt>จุดแข็ง</dt><dd>หาเรื่องได้ไม่หมด ช่องดูน่าเชื่อถือ</dd>
+    <dt>ระวัง</dt><dd>ข้อมูลผิดแค่จุดเดียวก็เสียความน่าเชื่อถือทั้งช่อง</dd></dl></div>
+  <div class="genre"><h4>🎬 เล่าสรุปคลิป (แนวของช่องตัวอย่าง)</h4><dl>
+    <dt>วัตถุดิบ</dt><dd>คลิป YouTube ที่ติด CC BY และเจ้าของถ่ายเอง</dd>
+    <dt>ภาพ</dt><dd>ฟุตเทจจริงจากคลิปต้นทาง</dd>
+    <dt>จุดแข็ง</dt><dd>ภาพจริงดึงดูดคน และทำได้เร็ว</dd>
+    <dt>ระวัง</dt><dd>หาคลิปที่ใช้ได้จริงยาก และต้องมีมุมของตัวเอง ไม่ใช่แค่แปล</dd></dl></div>
+  <div class="genre"><h4>📰 สรุปข่าว / ประเด็นร้อน</h4><dl>
+    <dt>วัตถุดิบ</dt><dd>สำนักข่าว 2 แห่งขึ้นไป แล้วเรียบเรียงใหม่ด้วยคำของเรา</dd>
+    <dt>ภาพ</dt><dd>กราฟิกของช่อง + ภาพสต็อก</dd>
+    <dt>จุดแข็ง</dt><dd>ทันกระแส คนค้นหาเยอะ</dd>
+    <dt>ระวัง</dt><dd>ห้ามใช้คลิปจากช่องทีวี ระวังคดีที่ยังไม่จบ และการทวนข้อกล่าวหาของคนอื่น</dd></dl></div>
+  <div class="genre"><h4>✨ แนวของคุณเอง</h4><dl>
+    <dt>วิธีหา</dt><dd>ให้ Claude เสนอ 5 แนวจากสิ่งที่คุณชอบ สิ่งที่ถนัด และเวลาที่มี</dd>
+    <dt>เกณฑ์</dt><dd>คุณเองอยากดูไหม · ทำได้สัก 100 คลิปไหม · ภาพมาจากไหนได้โดยไม่ผิดลิขสิทธิ์</dd></dl></div>
+</div>
+<div class="pre"><div class="lbl">พิมพ์ใน Claude Code</div><pre>ฉันชอบ [ ] ถนัด [ ] มีเวลาวันละ [ ] ชั่วโมง ช่วยเสนอแนวช่องคลิปสั้น 5 แนวที่เหมาะกับฉัน
+บอกข้อดีข้อเสีย ภาพมาจากไหน และความเสี่ยงลิขสิทธิ์ของแต่ละแนว (ดู GENRES.md)</pre><button class="copy">คัดลอก</button></div>
+
+<!-- 5 TOOLS -->
+<h2 id="tools"><span class="n">5</span>เครื่องมือ + การเชื่อมต่อ</h2>
+<p class="sub">แบ่งเป็น 3 ระดับ แค่ระดับ 1 ก็ทำคลิปได้แล้ว ระดับอื่นค่อยเพิ่มทีหลัง</p>
+<div class="tbl"><table>
+<thead><tr><th>ระดับ</th><th>เครื่องมือ</th><th>ใช้ทำอะไร</th><th>ค่าใช้จ่าย</th><th>ต้องเชื่อมยังไง</th></tr></thead>
+<tbody>
+<tr><td><span class="tag t1">1 ต้องมี</span></td><td><b>Claude Code</b> ใน VS Code</td><td>ตัวหลัก คิด เขียน และสั่งรันทุกอย่าง</td><td>แพ็กเกจ Claude แบบเสียเงิน</td><td>ติดตั้ง <a href="https://code.visualstudio.com/" target="_blank" rel="noopener">VS Code</a> → ส่วนขยาย "Claude Code" → ล็อกอินบัญชี Claude</td></tr>
+<tr><td><span class="tag t1">1 ต้องมี</span></td><td><b>Python 3.10+</b></td><td>รันสคริปต์ใน Kit</td><td>ฟรี</td><td><a href="https://www.python.org/downloads/" target="_blank" rel="noopener">python.org</a> (Windows ให้ติ๊ก "Add to PATH")</td></tr>
+<tr><td><span class="tag t1">1 ต้องมี</span></td><td><b>ffmpeg</b></td><td>ตัด ต่อ ใส่ซับ ผสมเสียง เรนเดอร์</td><td>ฟรี</td><td>Windows: <code>winget install Gyan.FFmpeg</code> · Mac: <code>brew install ffmpeg</code></td></tr>
+<tr><td><span class="tag t1">1 ต้องมี</span></td><td><b>Gemini TTS</b></td><td>เสียงพากย์ภาษาไทย</td><td>มีโควตาฟรี (ประมาณ 10 ครั้งต่อวันต่อรุ่น และอาจเปลี่ยนได้)</td><td><a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a> → Create API key → ใส่ใน <code>.env</code></td></tr>
+<tr><td><span class="tag t1">1 ต้องมี</span></td><td><b>ฟอนต์ไทย</b></td><td>ซับ</td><td>ฟรี</td><td><a href="https://fonts.google.com/?subset=thai" target="_blank" rel="noopener">Google Fonts (Thai)</a> → วางในโฟลเดอร์ <code>fonts/</code></td></tr>
+<tr><td><span class="tag t1">1 ต้องมี</span></td><td><b>เพลงประกอบ</b></td><td>เพลงคลอใต้เสียงพากย์</td><td>ฟรี</td><td>YouTube Audio Library (ใน YouTube Studio) · <a href="https://incompetech.com/" target="_blank" rel="noopener">incompetech</a> (ต้องใส่เครดิต)</td></tr>
+<tr><td><span class="tag t2">2 ตามแนว</span></td><td><b>ภาพ AI</b></td><td>ฉากของเรื่องแต่ง นิทาน หรือภาพจำลอง</td><td>ฟรี ถึงหลักร้อยบาทต่อเดือน</td><td>มี 3 แบบ: API, เว็บ หรือติดตั้งในเครื่อง (ดูตารางใน <code>GENRES.md</code>) แล้วบอก Claude ว่าเครื่องคุณมีอะไร</td></tr>
+<tr><td><span class="tag t2">2 ตามแนว</span></td><td><b>Pexels API</b></td><td>ภาพหรือคลิปสต็อก</td><td>ฟรี</td><td><a href="https://www.pexels.com/api/" target="_blank" rel="noopener">pexels.com/api</a> → เอา key ใส่ <code>.env</code></td></tr>
+<tr><td><span class="tag t2">2 ตามแนว</span></td><td><b>yt-dlp</b></td><td>โหลดคลิปต้นทางและอ่าน license (แนวเล่าสรุปคลิป)</td><td>ฟรี</td><td><code>pip install -U yt-dlp</code></td></tr>
+<tr><td><span class="tag t2">2 เสริม</span></td><td><b>faster-whisper</b></td><td>จับเวลาซับให้ตรงคำ และถอดเสียงคลิป</td><td>ฟรี</td><td><code>pip install faster-whisper</code> · มีการ์ดจอ NVIDIA จะเร็วกว่ามาก</td></tr>
+<tr><td><span class="tag t3">3 ขั้นสูง</span></td><td><b>YouTube Data API</b></td><td>ดึงยอดของช่องตัวเองอัตโนมัติ และค้นหาคลิป</td><td>ฟรี</td><td>ดูขั้นตอนด้านล่าง</td></tr>
+<tr><td><span class="tag t3">3 ขั้นสูง</span></td><td><b>Facebook Graph API</b></td><td>ดึงยอดเพจและ Reels</td><td>ฟรี</td><td>ดูขั้นตอนด้านล่าง</td></tr>
+</tbody></table></div>
+<div class="note bad"><b>เก็บ key ให้ปลอดภัย</b>ใส่ไว้ในไฟล์ <code>.env</code> เท่านั้น (Kit มี <code>.gitignore</code> กันไว้แล้ว) ห้ามแปะ key ในแชตกลุ่ม ในสคริปต์ที่จะแชร์ หรือในภาพหน้าจอ ถ้าหลุดให้ลบ key เก่าแล้วสร้างใหม่ทันที</div>
+<details>
+<summary>ขั้นตอนเชื่อม YouTube Data API (ทำครั้งเดียว ประมาณ 15 นาที)</summary>
+<ol>
+<li>เข้า <a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud Console</a> → สร้างโปรเจกต์ใหม่</li>
+<li>APIs &amp; Services → Library → เปิดใช้ <b>YouTube Data API v3</b> (ถ้าจะดูยอดละเอียด เปิด <b>YouTube Analytics API</b> ด้วย)</li>
+<li>OAuth consent screen → External → ใส่ชื่อแอปอะไรก็ได้ → เพิ่มอีเมลตัวเองเป็น Test user</li>
+<li>Credentials → Create credentials → OAuth client ID → ชนิด <b>Desktop app</b> → ดาวน์โหลดไฟล์ JSON</li>
+<li>เปลี่ยนชื่อไฟล์เป็น <code>client_secret.json</code> แล้ววางในโฟลเดอร์ Kit</li>
+<li>บอก Claude ว่า <i>"เขียนสคริปต์ดึงยอดคลิปในช่องฉันจาก YouTube API ใช้ client_secret.json"</i> ครั้งแรกจะเด้งหน้าเว็บให้ล็อกอิน แล้วจะได้ token เก็บไว้ใช้ต่อ</li>
+</ol>
+<p>โควตาฟรีวันละ 10,000 หน่วย ค้นหา 1 ครั้งใช้ 100 หน่วย</p>
+</details>
+<details>
+<summary>ขั้นตอนเชื่อม Facebook Graph API (ไม่บังคับ)</summary>
+<ol>
+<li><a href="https://developers.facebook.com/" target="_blank" rel="noopener">developers.facebook.com</a> → My Apps → Create App (ประเภท Business)</li>
+<li>เปิด <b>Graph API Explorer</b> → เลือกแอป → ขอสิทธิ์ <code>pages_show_list</code>, <code>pages_read_engagement</code>, <code>read_insights</code> → Generate token</li>
+<li>บอก Claude ให้แลกเป็น long-lived token แล้วต่อเป็น Page token</li>
+<li>เก็บ token ใน <code>.env</code> แล้วสั่ง Claude เขียนสคริปต์ดึงยอด Reels</li>
+</ol>
+<p>จากที่เราลอง การอัปคลิปผ่าน API ติดเงื่อนไขของแอปในโหมดพัฒนา จึง<b>อัปเองผ่าน Meta Business Suite</b> แล้วใช้ API แค่ดึงยอด</p>
+</details>
+
+<!-- 6 INSTALL -->
+<h2 id="install"><span class="n">6</span>ติดตั้ง</h2>
+<ol>
+<li>ติดตั้ง VS Code, Python และ ffmpeg ตามตารางด้านบน แล้ว<b>ปิดและเปิด VS Code ใหม่</b></li>
+<li>แตกไฟล์ <a href="#kit">Starter Kit</a> → VS Code → File → Open Folder → เลือกโฟลเดอร์ <code>shorts-starter-kit</code></li>
+<li>เปิด Terminal ใน VS Code แล้วรัน:</li>
+</ol>
+<div class="pre"><div class="lbl">Terminal</div><pre>pip install -r requirements.txt
+copy .env.example .env      # Mac: cp .env.example .env</pre><button class="copy">คัดลอก</button></div>
+<ol start="4">
+<li>เปิดไฟล์ <code>.env</code> แล้วใส่ <code>GEMINI_API_KEY</code></li>
+<li>เปิดแผง Claude Code แล้ววางประโยคนี้:</li>
+</ol>
+<div class="pre"><div class="lbl">พิมพ์ใน Claude Code</div><pre>อ่าน CLAUDE.md กับ PLAYBOOK.md แล้วรัน python tools/check_setup.py บอกฉันว่ายังขาดอะไร และช่วยติดตั้งตัวที่ขาด</pre><button class="copy">คัดลอก</button></div>
+
+<!-- 7 STYLE -->
+<h2 id="style"><span class="n">7</span>หน้าตาช่อง: ต้องเป็นของคุณเอง</h2>
+<p>ฟอนต์ สีซับ สีคำเน้น ตำแหน่งซับ และโลโก้ คือสิ่งที่ทำให้คนดูจำช่องคุณได้ภายในวินาทีแรก</p>
+<div class="pre"><div class="lbl">พิมพ์ใน Claude Code</div><pre>ช่วยออกแบบสไตล์ช่อง ให้เข้ากับแนวช่องใน PLAYBOOK อยากให้ความรู้สึก [ ]
+เสนอ 3 แบบที่ต่างกันชัดๆ ทำภาพพรีวิวให้ดู (ดู STYLE.md)</pre><button class="copy">คัดลอก</button></div>
+<div class="note acc"><b>Kit จงใจไม่มีหน้าตาสำเร็จรูปให้</b>ตัวประกอบคลิปจะไม่ยอมเรนเดอร์จนกว่าคุณจะมี <code>style.json</code> ของตัวเอง เพราะถ้าทุกคนที่ได้ Kit ใช้หน้าตาเดียวกัน คลิปจะออกมาเหมือนกันหมดและไม่มีใครโดดเด่น</div>
+
+<!-- 8 RIGHTS -->
+<h2 id="rights"><span class="n">8</span>ลิขสิทธิ์ + กฎแพลตฟอร์ม</h2>
+<p class="sub">ข้อนี้พลาดแล้วช่องโดนลงโทษหรือปิดได้ (เป็นสรุปจากประสบการณ์ ไม่ใช่คำปรึกษาทางกฎหมาย)</p>
+<div class="grid g2">
+  <div class="note ok" style="margin:0"><b>✅ ใช้ได้</b>
+    <ul style="margin:6px 0 0">
+      <li>ของที่สร้างเอง: บทที่แต่งเอง ภาพ AI ที่เจนเอง ฟุตเทจที่ถ่ายเอง</li>
+      <li>Pexels / Pixabay และสาธารณสมบัติ (เช่น NASA)</li>
+      <li>คลิป YouTube ที่ติด <b>CC BY</b> และ<b>เจ้าของถ่ายเอง</b></li>
+      <li>ของที่ขออนุญาตแล้ว (เก็บแชตไว้เป็นหลักฐาน)</li>
+    </ul></div>
+  <div class="note bad" style="margin:0"><b>❌ ห้าม</b>
+    <ul style="margin:6px 0 0">
+      <li>หนัง การ์ตูน รายการทีวี เพลงดัง และนิยายที่มีลิขสิทธิ์</li>
+      <li>เนื้อหาจากเพจหรือช่องแนวเดียวกัน (เอาได้แค่ไอเดีย)</li>
+      <li>คลิปติด CC แต่เอาของคนอื่นมาอัป (reaction, รวมคลิป)</li>
+      <li>ลบหรือเบลอลายน้ำของเจ้าของ</li>
+    </ul></div>
+</div>
+<ul style="margin-top:16px">
+<li><b>ต้องมีความเป็นต้นฉบับ</b> แพลตฟอร์มลงโทษเนื้อหาที่ซ้ำซากหรือเอาของคนอื่นมาวางเฉยๆ (inauthentic / reused content) คลิป AI ที่ผลิตเป็นจำนวนมากโดยไม่มีมุมของตัวเองก็เสี่ยง</li>
+<li><b>ติดป้าย AI</b> ตามที่แต่ละแพลตฟอร์มกำหนด เช่นเสียงพากย์ AI หรือภาพที่ดูเหมือนจริง</li>
+<li><b>คนจริงในภาพ:</b> ห้ามบรรยายให้เขาเสียหาย ห้ามใส่คำพูดที่เขาไม่ได้พูด และภาพ AI ห้ามหน้าเหมือนคนจริงหรือดารา</li>
+<li>เก็บแหล่งที่มาทุกอย่างใน <code>SOURCES.md</code> ถ้าเจ้าของขอให้ลบ → <b>ลบทันที</b></li>
+</ul>
+
+<!-- 9 PRODUCE -->
+<h2 id="produce"><span class="n">9</span>ทำคลิปทีละขั้น</h2>
+<p class="sub">ทำเป็นรอบ ครั้งละ 3–5 คลิป ประหยัดโควตาเสียง และเห็นภาพรวมได้ดีกว่า (ประโยคทั้งหมดอยู่ใน <code>PROMPTS.md</code>)</p>
+<h3>① เสนอหัวข้อ</h3>
+<div class="pre"><div class="lbl">พิมพ์ใน Claude Code</div><pre>เสนอหัวข้อ 5 เรื่องตาม PLAYBOOK ข้อ 2 [เกี่ยวกับ ...]
+ตอบเป็นตาราง: เรื่อง · ฮุคร่าง · จุดพีค · วัตถุดิบ/แหล่งที่มา · ยังไม่ต้องลงมือ</pre><button class="copy">คัดลอก</button></div>
+<p>ที่บอกว่า "ยังไม่ต้องลงมือ" เพราะถ้าไม่บอก Claude มักทำต่อไปเลย คุยให้จบก่อนว่าจะเอาเรื่องไหนแล้วค่อยลงมือ</p>
+<h3>② ร่างบท</h3>
+<div class="pre"><div class="lbl">พิมพ์ใน Claude Code</div><pre>ทำเลย ข้อ [1, 3, 4] — เตรียมวัตถุดิบ แล้วร่างบททุกคลิปให้ฉันดูก่อน</pre><button class="copy">คัดลอก</button></div>
+<p>อ่านบทแล้วติตรงๆ เช่น "ฮุคไม่แรง ขอ 3 ตัวเลือก" หรือ "ภาษาแข็ง ทำให้เป็นภาษาพูด" <b>ผ่านบทก่อนค่อยทำเสียงเสมอ</b></p>
+<h3>③ เสียง + ซับ + ภาพ + ประกอบ</h3>
+<div class="pre"><div class="lbl">พิมพ์ใน Claude Code</div><pre>บทผ่านแล้ว เจนเสียงรวมครั้งเดียวทุกคลิป แล้วทำซับ หา/เจนภาพ ประกอบคลิปให้เสร็จ ตรวจเฟรมเองก่อนส่ง</pre><button class="copy">คัดลอก</button></div>
+<p>เบื้องหลัง Claude จะรันตามลำดับ: <code>tts_gemini.py</code> → <code>make_caps.py</code> → เตรียมภาพ → เขียน <code>shots.json</code> → <code>build_short.py</code> ได้ไฟล์ <code>clips/&lt;ชื่อ&gt;/out/&lt;ชื่อ&gt;.mp4</code> ถ้าเป็นภาพนิ่ง ใส่ <code>"move": "in"</code> เพื่อซูมช้าๆ ให้ภาพไม่นิ่งตาย</p>
+<h3>④ แก้จุดที่ไม่ชอบ</h3>
+<div class="pre"><div class="lbl">พิมพ์ใน Claude Code</div><pre>คลิป [ ] วิที่ [ ] ภาพไม่ตรงกับที่พูด / ซับไม่ตรงเสียง / เสียงอ่านคำว่า [ ] ผิด — แก้แล้วเรนเดอร์ใหม่</pre><button class="copy">คัดลอก</button></div>
+<h3>⑤ สอนระบบ (ขั้นที่สำคัญที่สุด)</h3>
+<div class="pre"><div class="lbl">พิมพ์ใน Claude Code</div><pre>ฉันไม่ชอบ [ ] เพราะ [ ] — จดเป็นกฎลง PLAYBOOK แล้วใช้ตั้งแต่คลิปถัดไป</pre><button class="copy">คัดลอก</button></div>
+
+<!-- 10 LESSONS -->
+<h2 id="lessons"><span class="n">10</span>หลักที่ใช้ได้ทุกแนว</h2>
+<p class="sub">สรุปจากช่องตัวอย่าง 100 กว่าคลิป เป็นหลักคิด ไม่ใช่สูตรสำเร็จ แต่ละช่องต้องทดลองเอง</p>
+<div class="lesson"><div class="k">01</div><div><h4>3 วินาทีแรกตัดสินทุกอย่าง</h4><p>ประโยคแรกต้องทำให้อยากรู้ต่อ บอกผลลัพธ์หรือความผิดปกติก่อน ห้ามเปิดด้วย "วันนี้จะมาเล่า…" บน Facebook คนหลุดหนักช่วงวินาทีที่ 3–5</p></div></div>
+<div class="lesson"><div class="k">02</div><div><h4>เรื่องที่ผูกกับชีวิตคนดูชนะ</h4><p>คนคอมเมนต์เมื่อเรื่องทำให้นึกถึงประสบการณ์ตัวเอง ในช่องตัวอย่าง เรื่องไกลตัวได้ 1–3K วิว ส่วนเรื่องที่คนดูเจอเองได้หลักหมื่นถึงหลักแสน</p></div></div>
+<div class="lesson"><div class="k">03</div><div><h4>ต้องมีจุดพีค</h4><p>ก่อนทำถามตัวเองว่า "คนดูได้อะไรกลับไป" จะเป็นหักมุม ข้อมูลใหม่ อารมณ์แรง หรือประเด็นให้เถียงก็ได้ แค่น่ารักหรือดูเพลินไม่พอ</p></div></div>
+<div class="lesson"><div class="k">04</div><div><h4>อัปทุกแพลตฟอร์ม</h4><p>คลิปเดียวกันได้ 400K บน YouTube แต่ 29K บน FB ขณะที่อีกคลิปกลับกัน เดาไม่ได้ว่าที่ไหนจะปัง</p></div></div>
+<div class="lesson"><div class="k">05</div><div><h4>เรื่องเดียว เส้นเดียว</h4><p>เล่าเรียงเวลา ห้ามแทรกเรื่องรอง ในช่องตัวอย่าง คลิป 40–50 วิคนดูจบมากกว่าคลิปที่ยาวเกิน แต่ตัวตัดสินจริงคือฮุคกับชื่อคลิป</p></div></div>
+<div class="lesson"><div class="k">06</div><div><h4>ภาษาพูด ไม่ใช่ภาษาเขียน</h4><p>เขียนเหมือนเล่าให้เพื่อนฟัง ฟังเสียง AI ทุกคลิป คำที่อ่านเพี้ยนให้เปลี่ยนคำในบท แล้วจดลง PLAYBOOK</p></div></div>
+<div class="lesson"><div class="k">07</div><div><h4>ข้อเท็จจริงต้องเช็คทุกตัว</h4><p>ระบบถอดเสียงและ AI ให้ตัวเลขผิดได้ ข้อมูลสุขภาพ การเงิน หรือความปลอดภัยต้องมีแหล่งจริงเสมอ</p></div></div>
+<div class="lesson"><div class="k">08</div><div><h4>ซับต้องตรงเสียงทุกคำ</h4><p>ถ้าซับสรุปเองหรือเขียนย่อ คนดูจะรู้สึกว่าไม่ตรง ตัวเลขในซับเขียนเป็นเลขอารบิกเพื่อให้อ่านเร็ว</p></div></div>
+<div class="lesson"><div class="k">09</div><div><h4>ตัดต่อนิ่งๆ ดีกว่าหวือหวา</h4><p>ซูมกระแทก จอสั่น และแฟลช ทำให้คนดูรู้สึกว่าคลิปกระตุก ภาพเต็มจอแนวตั้งดีกว่าภาพลอยกลางจอ</p></div></div>
+<div class="lesson"><div class="k">10</div><div><h4>ทำให้ได้ 30 คลิปก่อนตัดสิน</h4><p>ยอดของคลิปสั้นแกว่งมาก คลิปที่ปังที่สุดของช่องตัวอย่างคือคลิปที่ 20 ดังนั้นอย่าเลิกหรือเปลี่ยนแนวจากยอดแค่ไม่กี่คลิป</p></div></div>
+
+<!-- 11 UPLOAD -->
+<h2 id="upload"><span class="n">11</span>อัปโหลด + สร้างรายได้</h2>
+<div class="grid g2">
+  <div class="card"><b>YouTube Shorts</b>
+    <ol style="margin:8px 0 0">
+      <li>YouTube Studio → สร้าง → อัปโหลดวิดีโอ (แนวตั้ง ไม่เกิน 3 นาทีจะเป็น Shorts อัตโนมัติ)</li>
+      <li>ใส่ชื่อและคำอธิบายจาก <code>description.txt</code></li>
+      <li>กลุ่มเป้าหมาย: เลือกว่า "สร้างมาเพื่อเด็ก" หรือไม่ (นิทานเด็กต้องเลือกใช่)</li>
+      <li><b>เนื้อหาดัดแปลงหรือสังเคราะห์:</b> ตอบ "ใช่" ถ้ามีภาพหรือเสียง AI ที่ดูเหมือนจริง</li>
+      <li>เผยแพร่ทันที หรือตั้งเวลา</li>
+    </ol></div>
+  <div class="card"><b>Facebook Reels</b>
+    <ol style="margin:8px 0 0">
+      <li>Meta Business Suite → สร้าง Reel → อัปไฟล์</li>
+      <li>แคปชัน: ชื่อคลิป เว้น 1 บรรทัด แล้วตามด้วยคำอธิบาย</li>
+      <li>เปิดป้าย <b>"ข้อมูล AI"</b> ถ้ามีเสียงหรือภาพ AI</li>
+      <li>แชร์ทันที หรือตั้งเวลา</li>
+    </ol></div>
+</div>
+<h3>คำถามที่เจอบ่อย</h3>
+<div class="grid g2">
+  <div class="card qa"><h4>ลงบ่อยแค่ไหนดี?</h4><p>สม่ำเสมอสำคัญกว่าจำนวน ถ้าทำได้ให้ลงวันละ 1–2 คลิปทุกวัน ทำเป็นรอบแล้วตั้งเวลาลงล่วงหน้า</p></div>
+  <div class="card qa"><h4>กี่วันถึงเห็นผล?</h4><p>ช่องตัวอย่างมีคลิปแรกที่ได้หลักหมื่นในสัปดาห์แรก และได้หลักแสนตอนคลิปที่ 18–20 ไม่มีอะไรรับประกัน แต่จะรู้ได้ก็ต่อเมื่อทำครบสัก 30 คลิป</p></div>
+  <div class="card qa"><h4>YouTube จ่ายเงินตอนไหน?</h4><p>ต้องเข้าโปรแกรมพาร์ทเนอร์ (YPP) โดยทั่วไปต้องมี 1,000 ผู้ติดตาม <b>และ</b>วิว Shorts 10 ล้านใน 90 วัน หรือชั่วโมงดูคลิปยาว 4,000 ชั่วโมงใน 12 เดือน มีรายงานว่าตั้งแต่ 1 ก.พ. 2570 ผู้สมัครใหม่ต้องได้วิว Shorts 20 ล้าน หรือ 8,000 ชั่วโมง (ข้อมูล ณ พ.ย. 2569 ให้เช็คเงื่อนไขจริงที่แท็บ "สร้างรายได้" ใน YouTube Studio)</p></div>
+  <div class="card qa"><h4>Facebook จ่ายเงินตอนไหน?</h4><p>ผ่านโปรแกรม Content Monetization ซึ่งส่วนใหญ่ใช้ระบบเชิญ ดูสถานะได้ที่ Professional Dashboard → สร้างรายได้ (Monetization) แหล่งข้อมูลภายนอกบอกเกณฑ์ไม่ตรงกัน และ Meta มีโปรแกรม Creator Fast Track ให้เข้าเร็วขึ้น ให้เช็คที่หน้าของ Meta เอง</p></div>
+  <div class="card qa"><h4>ช่องตัวอย่างมีรายได้หรือยัง?</h4><p>ยังไม่มีรายได้จากโฆษณา เพราะยังไม่ถึงเกณฑ์ของทั้งสองแพลตฟอร์ม ตอนนี้มีรายได้เล็กน้อยจากการปักตะกร้าสินค้า (affiliate) บนเพจ Facebook</p></div>
+  <div class="card qa"><h4>มีรายได้ทางอื่นก่อนถึงเกณฑ์ไหม?</h4><p>Affiliate (ปักตะกร้า Shopee หรือ Lazada) เริ่มได้ตั้งแต่ช่องยังเล็ก แต่ควรใส่เฉพาะคลิปที่สินค้าเกี่ยวกับเรื่องจริงๆ บอกในแคปชันว่ามีลิงก์ affiliate ห้ามอ้างสรรพคุณเกินจริง และห้ามวางสินค้าในคลิปที่มีหน้าคนจริงจนดูเหมือนเขารับรองสินค้า</p></div>
+  <div class="card qa"><h4>ใช้ช่องเดียวทำหลายแนวได้ไหม?</h4><p>ไม่แนะนำ ระบบแนะนำคลิปของแพลตฟอร์มจะสับสนว่าช่องคุณเหมาะกับใคร ถ้าอยากลองหลายแนว แยกเป็นคนละช่องแล้วใช้ Kit ชุดเดียวกันได้</p></div>
+</div>
+
+<!-- 12 MEASURE -->
+<h2 id="measure"><span class="n">12</span>วัดผลแล้วปรับ</h2>
+<ul>
+<li>ทุก 1–2 สัปดาห์ เอายอดของทุกคลิปมาให้ Claude วิเคราะห์ (ก๊อปจาก YouTube Studio หรือ Business Suite ได้ หรือใช้ API ในข้อ 5)</li>
+<li>ดูอย่างน้อย 4 ค่า: <b>วิว · % ที่ดูจนจบ · คอมเมนต์ · แชร์</b> แยกตามแพลตฟอร์ม</li>
+<li>จัดกลุ่มตามแนวเรื่อง แบบฮุค และความยาว แล้วดู "ค่ากลาง" ของแต่ละกลุ่ม ไม่ดูแค่คลิปที่ปังคลิปเดียว</li>
+<li>ข้อสรุปที่ได้ → ให้ Claude แก้ <code>PLAYBOOK.md</code> แล้วใช้กับรอบถัดไป</li>
+</ul>
+<div class="pre"><div class="lbl">พิมพ์ใน Claude Code</div><pre>นี่คือยอดของแต่ละคลิป [วางตัวเลข] วิเคราะห์ว่าแบบไหนได้ผล แล้วเสนอแก้ PLAYBOOK</pre><button class="copy">คัดลอก</button></div>
+
+<!-- 13 TROUBLE -->
+<h2 id="trouble"><span class="n">13</span>ปัญหาที่เจอบ่อย</h2>
+<div class="tbl"><table>
+<thead><tr><th>อาการ</th><th>สาเหตุ / ทางแก้</th></tr></thead>
+<tbody>
+<tr><td>TTS ขึ้น 429</td><td>โควตาฟรีของวันนั้นหมด รอรีเซ็ต หรือเปิด billing ใน AI Studio · ป้องกันโดย<b>รวมหลายบทเจนครั้งเดียว</b></td></tr>
+<tr><td>เสียงอ่านโน้ตกำกับออกมาด้วย</td><td>TTS บางรุ่นไม่รับโน้ตกำกับ ให้เปลี่ยนรุ่นใน <code>.env</code> หรือเอาโน้ตออก</td></tr>
+<tr><td>เจนรวมแล้วคำข้ามไปอีกคลิป</td><td>จุดหั่นอัตโนมัติพลาด ให้ Claude ฟังต้นและท้ายทุกไฟล์ แล้วหั่นใหม่ตามช่วงเงียบจริง</td></tr>
+<tr><td>เสียงอ่านคำผิด</td><td>เปลี่ยนคำในบท แล้วจดรายการคำเสี่ยงลง PLAYBOOK</td></tr>
+<tr><td>สระหรือวรรณยุกต์ในซับลอย/หาย</td><td>ต้องเรนเดอร์ซับแบบ complex shaping (Kit ทำให้แล้ว) ถ้าทำซับด้วยวิธีอื่นให้ระวังจุดนี้</td></tr>
+<tr><td>ซับเร็วหรือช้ากว่าเสียง</td><td>ติดตั้ง faster-whisper ให้จับเวลาจากเสียงจริง หรือสั่ง Claude แก้เวลาใน <code>caps_timed.json</code></td></tr>
+<tr><td>ภาพ AI หน้าตัวละครไม่เหมือนกันทุกภาพ</td><td>เขียนคำบรรยายตัวละครแบบตายตัวไว้ใน PLAYBOOK แล้วใช้ภาพอ้างอิงตัวละครถ้าเครื่องมือรองรับ</td></tr>
+<tr><td>ภาพ AI ได้ฉากต่างประเทศ</td><td>ระบุสถานที่ให้ชัดในทุกคำสั่งเจนภาพ เช่น "ชนบทไทย" หรือ "ตึกแถวกรุงเทพ"</td></tr>
+<tr><td>หา <code>ffmpeg</code> ไม่เจอ</td><td>ปิดแล้วเปิด VS Code ใหม่</td></tr>
+</tbody></table></div>
+
+<!-- KIT -->
+<h2 id="kit">⬇ Starter Kit</h2>
+<p class="sub">ไฟล์ทั้งหมดที่ต้องใช้ในการเริ่ม · ใช้และแก้ไขเพื่อทำช่องของคุณเองได้ · <b>ห้ามแจกต่อ ห้ามขาย ห้ามเผยแพร่ซ้ำ</b></p>
+<div class="dl"><a class="btn" href="shorts-starter-kit.zip" download>ดาวน์โหลด shorts-starter-kit.zip</a></div>
+<div class="tbl"><table>
+<thead><tr><th>ไฟล์</th><th>คืออะไร</th></tr></thead>
+<tbody>
+<tr><td><code>CLAUDE.md</code></td><td>คำสั่งประจำโปรเจกต์ Claude อ่านเองอัตโนมัติ</td></tr>
+<tr><td><code>PLAYBOOK.md</code></td><td>กติกาช่องแบบเทมเพลต มีหลักการที่ใช้ได้ทุกแนว และช่องว่างให้เติมของคุณ</td></tr>
+<tr><td><code>GENRES.md</code></td><td>แนวช่องตัวอย่าง 5 แนว + ตัวเลือกเครื่องมือภาพ AI</td></tr>
+<tr><td><code>STYLE.md</code></td><td>วิธีออกแบบหน้าตาช่อง → <code>style.json</code></td></tr>
+<tr><td><code>PROMPTS.md</code></td><td>ประโยคสั่งงานทุกขั้น</td></tr>
+<tr><td><code>tools/</code></td><td>เช็คเครื่อง · TTS · จับเวลาซับ · ประกอบคลิป 9:16 (ซูมช้าสำหรับภาพนิ่ง) · ถอดเสียง · หาคลิป CC BY · Pexels</td></tr>
+<tr><td><code>clips/_example/</code></td><td>ตัวอย่างไฟล์ของคลิป 1 ตัว</td></tr>
+<tr><td><code>LICENSE.md</code></td><td>เงื่อนไขการใช้งาน</td></tr>
+</tbody></table></div>
+
+<footer>
+  <p><b>© 2569 ดูมาให้แล้ว · สงวนลิขสิทธิ์</b> — คู่มือและ Starter Kit นี้ให้ใช้เฉพาะผู้ที่ได้รับลิงก์จากเจ้าของโดยตรง เพื่อทำช่องของตัวเอง · ห้ามคัดลอก แจกต่อ ขาย หรือเผยแพร่ซ้ำ ไม่ว่าทั้งหมดหรือบางส่วน โดยไม่ได้รับอนุญาตเป็นลายลักษณ์อักษร</p>
+  <p>ไม่รับประกันยอดวิวหรือรายได้ · กฎของแพลตฟอร์ม ลิขสิทธิ์ ราคา และโควตาของเครื่องมือเปลี่ยนได้ตลอด ผู้ใช้ต้องตรวจสอบเอง · ไม่ใช่คำปรึกษาทางกฎหมาย · ตัวเลขช่องตัวอย่าง ณ 14 พ.ย. 2569</p>
+</footer>
+</main>
+</div>
+<button class="theme" id="theme" aria-label="สลับธีม">◐ ธีม</button>
+<script>
+document.querySelectorAll(".copy").forEach(b => b.addEventListener("click", async () => {
+  const txt = b.parentElement.querySelector("pre").innerText;
+  try { await navigator.clipboard.writeText(txt); b.textContent = "คัดลอกแล้ว ✓"; }
+  catch (e) { b.textContent = "คัดลอกไม่ได้"; }
+  setTimeout(() => b.textContent = "คัดลอก", 1600);
+}));
+const root = document.documentElement;
+try { const s = localStorage.getItem("theme"); if (s) root.dataset.theme = s; } catch (e) {}
+document.getElementById("theme").addEventListener("click", () => {
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  try { localStorage.setItem("theme", root.dataset.theme); } catch (e) {}
+});
+</script>
+</body>
+</html>
